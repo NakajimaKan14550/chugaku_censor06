@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カメラセンサーの科学：光を電気に変える「元素」のキャッチボール</title>
+    <style>
+        /* Base Reset & Variables */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --color-main: #091a2d;
+            --color-accent: #f97316;
+            --color-bg: #f8fafc;
+            --color-text: #1e293b;
+            --color-muted: #64748b;
+            --color-white: #ffffff;
+            --max-width: 1200px;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--color-main);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+        .logo-link {
+            display: inline-block;
+        }
+        .logo-img {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #0f2b48 0%, var(--color-main) 100%);
+            color: var(--color-white);
+            padding: 80px 20px;
+            text-align: center;
+        }
+        .hero-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .hero-category {
+            background-color: var(--color-accent);
+            color: var(--color-white);
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+        .hero-lead {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        /* Section Styling */
+        section {
+            background-color: var(--color-white);
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            color: var(--color-main);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background-color: var(--color-accent);
+        }
+
+        /* Grid Layouts */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* Dialogue Box (Q&A Interface) */
+        .qa-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .dialogue-row {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .dialogue-row.student {
+            flex-direction: row;
+        }
+        .dialogue-row.engineer {
+            flex-direction: row-reverse;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .dialogue-row.student .avatar {
+            background-color: #e0f2fe;
+        }
+        .dialogue-row.engineer .avatar {
+            background-color: #ffedd5;
+        }
+        .bubble {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            position: relative;
+            font-size: 0.95rem;
+        }
+        .dialogue-row.student .bubble {
+            background-color: #f1f5f9;
+            color: var(--color-text);
+            border-top-left-radius: 2px;
+        }
+        .dialogue-row.engineer .bubble {
+            background-color: var(--color-main);
+            color: var(--color-white);
+            border-top-right-radius: 2px;
+        }
+        .bubble strong {
+            color: var(--color-accent);
+        }
+        .dialogue-row.student .bubble strong {
+            color: var(--color-main);
+        }
+        .speaker-name {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--color-muted);
+            margin-bottom: 4px;
+            display: block;
+        }
+        .dialogue-row.engineer .speaker-name {
+            text-align: right;
+            color: #94a3b8;
+        }
+
+        /* Thought box inside dialogue */
+        .thought-quote {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 3px solid var(--color-accent);
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            border-radius: 0 4px 4px 0;
+        }
+        .dialogue-row.student .thought-quote {
+            background-color: #ffffff;
+            border-left: 3px solid var(--color-main);
+        }
+
+        /* List styling inside engineering dialogue */
+        .tech-list {
+            list-style: none;
+            margin-top: 10px;
+            padding-left: 0;
+        }
+        .tech-list li {
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+            font-size: 0.9rem;
+        }
+        .tech-list li::before {
+            content: "・";
+            position: absolute;
+            left: 0;
+            color: var(--color-accent);
+            font-weight: bold;
+        }
+
+        /* Technical Commentary Panel */
+        .tech-panel {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--color-main);
+            padding: 25px;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .tech-panel h4 {
+            font-size: 1.1rem;
+            color: var(--color-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tech-panel h4::before {
+            content: '■';
+            color: var(--color-accent);
+            font-size: 0.8rem;
+        }
+        .tech-panel p {
+            font-size: 0.9rem;
+            color: #334155;
+        }
+
+        /* Editorial Note */
+        .editorial-note {
+            background-color: #f1f5f9;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        /* Image Zoom Styles */
+        .img-container {
+            margin-top: 15px;
+            text-align: center;
+            width: 100%;
+        }
+        .zoomable-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            cursor: zoom-in;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Zoom Overlay Class Controlled by JS */
+        .zoomable-image.zoomed {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1.1);
+            z-index: 2000;
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            cursor: zoom-out;
+        }
+        .zoom-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(9, 26, 45, 0.85);
+            z-index: 1999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .zoom-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            .bubble {
+                max-width: 90%;
+            }
+        }
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            .section-title {
+                font-size: 1.3rem;
+            }
+            .avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="https://nakajimakan14550.github.io/home/" class="logo-link">
+                <img src="logo.png" alt="CHRONIX" class="logo-img">
+            </a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-container">
+            <div class="hero-brand">
+                <span class="hero-category">Technical Commentary</span>
+            </div>
+            <h1 class="hero-title">教えてエンジニアさん！光を電気に変える「センサーと元素」のヒミツ</h1>
+            <p class="hero-lead">スマホのCMOSセンサーから暗闇を見通す赤外線センサーまで。目的に合わせて元素をスカウトする、ハイテクな数理・物理の世界を解説します。</p>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section id="qa-1">
+            <h2 class="section-title">プロローグ：そもそもセンサーって何をしているの？</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            サトウさん、スマホのカメラに使われている「CMOSセンサー」とか、暗闇でも見える「赤外線センサー」ってよく耳にするけど、そもそもどうやって光をキャッチしているんですか？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            いい質問だね！一言でいうとね、センサーの仕組みは<strong>「光と元素のキャッチボール」</strong>なんだ。カメラのセンサーの最大の役割は、<strong>「当たった光を、電気の信号に変えること」</strong>だよ。
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            光を電気に変える……？そんなことができるの？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            そう。光がセンサーの味付け（元素）にぶつかると、電気がピョコッと飛び出す仕組み（光電効果）を使っているんだ。でも、光には「目に見える光（可視光）」と「目に見えない光（赤外線など）」があるよね。実は、<strong>「どの元素を使うか」によって、キャッチできる光の種類が変わる</strong>んだ。ここが一番のポイントだよ！
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-panel">
+                    <div>
+                        <h4>技術原理の解説（光電変換変換の基本）</h4>
+                        <p style="margin-top: 10px;">イメージセンサーの根幹は、入射した光子（Photon）を電子（Electron）に変換する「光電効果」にあります。</p>
+                        <p style="margin-top: 10px;">固体物理学においては、半導体の価電子帯にある電子が光のエネルギーを吸収し、禁制帯（バンドギャップ）を飛び越えて伝導帯へと励起されることで電気信号が生まれます。このバンドギャップの大きさが、吸収できる光の波長（エネルギー）を決定します。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="censor1.png" alt="光電効果と半導体バンドギャップによる光励起のモデル図" class="zoomable-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="qa-2">
+            <h2 class="section-title">第1章：スマホの目は「ケイ素（シリコン）」でできている！</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            じゃあ、私たちがいつも使っているスマホのカメラは、どんな元素が光を捕まえているの？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            みんなのスマホに入っている「CMOSセンサー」の多くは、<strong>ケイ素（シリコン / $Si$）</strong>という元素でできているよ。地球の砂などにも大量に含まれている、すごく身近な元素なんだ。
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            シリコンって、あの半導体とかでよく聞くシリコン？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            そう！シリコンの得意技は、<strong>人間の目に見える光（赤、青、緑などの可視光）をキャッチすること</strong>なんだ。例えるなら、シリコンは<strong>「普通の野球ボール（目に見える光）を捕るのが大得意なグローブ」</strong>だね。シリコンくんが目に見える光をバッチリ捕まえてくれるから、スマホできれいな写真が撮れるんだよ。
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-panel">
+                    <div>
+                        <h4>技術原理の解説（シリコン半導体と可視光感度）</h4>
+                        <p style="margin-top: 10px;">ケイ素（$Si$）のバンドギャップエネルギーは約$1.12\text{ eV}$であり、これは波長に換算すると約$1100\text{ nm}$以下の光（可視光線から近赤外線の一部）を効率よく吸収できる特性を持っています。</p>
+                        <p style="margin-top: 10px;">この物理的性質が、人間の視覚特性（約$400\text{ nm} \sim 700\text{ nm}$）をカバーするCMOSイメージセンサーの基盤材料としてシリコンが最適である理由です。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="censor2.png" alt="シリコン（Si）の光吸収係数と可視光波長帯の相関グラフ" class="zoomable-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="qa-3">
+            <h2 class="section-title">第2章：見えない光を捕まえる魔法のチーム「InGaAs」</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            シリコンのグローブが優秀なら、暗闇で熱を見る「赤外線センサー」もシリコンで作ればいいんじゃないですか？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            そこが面白いところでね、赤外線は人間の目には見えない「エネルギーの低い熱の光」なんだ。実は、さっきのシリコンのグローブだと、<strong>赤外線はすり抜けてしまって捕まえられない</strong>んだよね。
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            ええっ！すり抜けちゃうんだ。じゃあどうするの？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            そこで登場するのが、<strong>「InGaAs（インガアス）」</strong>という素材なんだ！これは1つの元素ではなく、3つの元素を混ぜ合わせて作ったスペシャルなチームなんだよ。
+                            <div class="thought-quote">
+                                <strong>★InGaAsのメンバー紹介：</strong><br>
+                                ・<strong>$In$（インジウム）：</strong> タッチパネルなどにも使われる金属。<br>
+                                ・<strong>$Ga$（ガリウム）：</strong> 手のひらの体温で溶けちゃう不思議な金属。<br>
+                                ・<strong>$As$（ヒ素）：</strong> 単体だと毒性があるけれど、合体するとすごいパワーを発揮する元素。
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            インジウム、ガリウム、ヒ素……！なんだか強そうなチームですね！
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-panel">
+                    <div>
+                        <h4>技術原理の解説（化合物半導体による長波長化）</h4>
+                        <p style="margin-top: 10px;">赤外線（特に短波長赤外線：SWIRなど）を検出するためには、シリコンよりも小さなバンドギャップを持つ材料が必要です。</p>
+                        <p style="margin-top: 10px;">インジウム・ガリウム・ヒ素（$\text{InGaAs}$）に代表されるIII-V族化合物半導体は、元素の混晶比（組成比）を調整することでバンドギャップを約$0.75\text{ eV}$付近（受光波長：約$1.7\ \mu\text{m}$まで）に最適化でき、シリコンでは透過してしまう赤外線光子を確実に捉えることが可能になります。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="censor3.png" alt="化合物半導体（InGaAs）の結晶格子定数とバンドギャップの関係図" class="zoomable-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="qa-4">
+            <h2 class="section-title">第3章：自動運転の「目」としても大活躍！</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            その「InGaAs」で作った魔法のグローブを使うと、どんなことができるの？
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            このグローブは「目に見えない赤外線」をしっかり捕まえるから、真っ暗闇でも熱をキャッチして、ハッキリとした映像を映し出すことができるんだ。最近では、夜間や霧の中でも安全に走るための<strong>「車の自動運転の目（LiDARなど）」</strong>としても、ものすごく注目されているんだよ。
+                            <ul class="tech-list">
+                                <li><strong>強み①：霧や煙を突き抜ける</strong><br>赤外線は波長が長いため、空気中の小さな水滴や煙の粒子をすり抜けて遠くまで届く。それをInGaAsならしっかりキャッチできる。</li>
+                                <li><strong>強み②：夜間でもライト不要</strong><br>物体そのものが放つかすかな赤外線（熱）を電気に変えるため、光源がない真っ暗闇でも標的を識別可能。</li>
+                                <li><strong>強み③：人間の目に安全なレーザーの利用</strong><br>自動運転で遠くを測る際、人間の目を傷つけない安全な波長（$1550\text{ nm}$など）の赤外線レーザーを効率よく受光できる。</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            なるほど！見たい光の性質に合わせて、使う元素をスカウトして組み合わせているんですね！
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-panel">
+                    <div>
+                        <h4>技術原理の解説（SWIR領域のメリットと応用）</h4>
+                        <p style="margin-top: 10px;">$\text{InGaAs}$センサーがカバーする近赤外・短波長赤外（SWIR）領域は、大気散乱（レイリー散乱）の影響を受けにくいため、霧、煙、あるいはシリコンを透過する特定の物質（ウェハ内部や特定の樹脂など）の透視検査に威力を発揮します。</p>
+                        <p style="margin-top: 10px;">また、車載自動運転用LiDARにおいて、眼球の網膜に損傷を与えにくい「アイセーフ波長（$1550\text{ nm}$）」の高出力レーザーと組み合わせる受光素子として、高い量子効率を誇る$\text{InGaAs}$は不可欠な存在となっています。</p>
+                    </div>
+                    <div class="img-container">
+                        <img src="censor4.png" alt="自動運転LiDARにおける1550nm波長レーザーとInGaAs受光素子の動作プロセス" class="zoomable-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="epilogue">
+            <h2 class="section-title">エピローグ：これがマテリアル（材料）工学の面白さ</h2>
+            <div class="grid-2col">
+                <div class="qa-container">
+                    <div class="dialogue-row student">
+                        <div class="avatar">👧</div>
+                        <div class="bubble">
+                            <span class="speaker-name">アカリ（中学生）</span>
+                            今日のお話を一言でまとめると、「見える光なら地球にたくさんあるシリコン、見えない赤外線ならインジウム・ガリウム・ヒ素のチーム技！」ってことですね。
+                        </div>
+                    </div>
+                    <div class="dialogue-row engineer">
+                        <div class="avatar">👨‍💻</div>
+                        <div class="bubble">
+                            <span class="speaker-name">サトウ（開発エンジニア）</span>
+                            素晴らしいまとめだ、大正解！ハードウェアの進化は、ただ回路を細かくするだけじゃなくて、こうやって「光の物理的な性質に合わせて、最適な元素をナノレベルでコントロールする」という材料工学（マテリアルサイエンス）の力に支えられているんだよ。
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-panel">
+                    <div>
+                        <h4>総括：バンドギャップエンジニアリングの未来</h4>
+                        <p style="margin-top: 10px;">最先端のイメージング技術は、デジタル信号処理（ISP）だけでなく、受光層における「バンドギャップエンジニアリング」と密接に結びついています。</p>
+                        <p style="margin-top: 10px;">用途に応じて最適な元素を選択・結晶成長させる固体物理学アプローチこそが、次世代の超高感度カメラや自動運転インフラ、宇宙観測を可能にする技術的ブレイクスルーの核心です。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <article class="editorial-note">
+            <strong>【編集後記】</strong><br>
+            日常の風景を切り取るシリコン（$Si$）イメージセンサーから、目に見えない光を数理・物理的に可視化する$\text{InGaAs}$などの化合物半導体技術。センサーの進化とは、光子というエネルギーの塊をいかに効率よく捉えるかという、元素の特性を極限まで引き出すエンジニアたちの知恵の結晶です。
+        </article>
+
+    </main>
+
+    <div class="zoom-overlay" id="zoomOverlay"></div>
+
+    <footer style="background: #091a2d; color: #fff; padding: 60px 20px; text-align: center;">
+        <div class="footer-info">
+            <p class="company-name" style="font-size: 1.2rem;">© 2026 CHRONIX Technical Commentary Project.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
